@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 PUFFIN_SOURCES = \
-	puffin.pb.cc \
 	bit_reader.cc \
 	bit_writer.cc \
 	extent_stream.cc \
@@ -50,10 +49,11 @@ OBJDIR = obj
 SRCDIR = ../puffin_repo/src
 BSDIFDIR = ../bsdiff
 PUFFIN_OBJECTS += $(addprefix $(OBJDIR)/, $(PUFFIN_SOURCES:.cc=.o))
+PUFFIN_OBJECTS += $(OBJDIR)/puffin.pb.o
 BSDIF_OBJECTS = $(addprefix $(BSDIFDIR)/, $(BSDIF_OBJECTFILES))
 
 CXXFLAGS ?= -O3 -ggdb
-INCLUDES += -Iorig_include -Iorig_include/bsdiff/include -Iorig_include/puffin/src/include
+INCLUDES += -Iorig_include -Iorig_include/bsdiff/include -Iorig_include/puffin/src/include -Icodegen
 CXXFLAGS += $(INCLUDES) -Wall -fPIC -std=c++17
 CPPFLAGS += $(INCLUDES)
 LDLIBS = -lgflags -lglog -lprotobuf-lite -lpthread -lbrotlidec -lbrotlienc -lbz2 -ldivsufsort -ldivsufsort64
@@ -66,7 +66,8 @@ $(OBJDIR):
 	mkdir -p $@
 
 protocompilation:
-	protoc --proto_path=$(SRCDIR) $(SRCDIR)/puffin.proto --cpp_out $(SRCDIR)
+	mkdir -p codegen/puffin/src
+	protoc --proto_path=$(SRCDIR) $(SRCDIR)/puffin.proto --cpp_out codegen/puffin/src
 
 $(PUFFIN_OBJECTS): | $(OBJDIR) protocompilation
 
@@ -78,11 +79,16 @@ puffin: $(PUFFIN_OBJECTS) $(BSDIF_OBJECTS)
 
 clean:
 	rm -rf $(OBJDIR) puffin; \
+	rm -rf codegen; \
 	$(MAKE) -C $(BSDIFDIR) clean
 
 
 
 $(OBJDIR)/%.o: %.cc
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
+
+$(OBJDIR)/puffin.pb.o: protocompilation
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ codegen/puffin/src/puffin.pb.cc
+
 
 .PHONY: all clean test
