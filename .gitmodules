@@ -1,0 +1,6 @@
+[submodule "puffin_repo"]
+	path = puffin_repo
+	url = https://android.googlesource.com/platform/external/puffin
+[submodule "bsdiff_repo"]
+	path = bsdiff_repo
+	url = https://android.googlesource.com/platform/external/bsdiff
