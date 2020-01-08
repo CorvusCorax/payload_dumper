@@ -15,7 +15,6 @@ PUFFIN_SOURCES = \
 	puff_writer.cc \
 	puffin_stream.cc \
 	puffdiff.cc \
-	puffpatch.cc \
 	main.cc \
 	utils.cc
 
@@ -50,6 +49,7 @@ SRCDIR = ../puffin_repo/src
 BSDIFDIR = ../bsdiff
 PUFFIN_OBJECTS += $(addprefix $(OBJDIR)/, $(PUFFIN_SOURCES:.cc=.o))
 PUFFIN_OBJECTS += $(OBJDIR)/puffin.pb.o
+PUFFIN_OBJECTS += $(OBJDIR)/puffpatch.o
 BSDIF_OBJECTS = $(addprefix $(BSDIFDIR)/, $(BSDIF_OBJECTFILES))
 
 CXXFLAGS ?= -O3 -ggdb
@@ -89,6 +89,8 @@ $(OBJDIR)/%.o: %.cc
 
 $(OBJDIR)/puffin.pb.o: protocompilation
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ codegen/puffin/src/puffin.pb.cc
+$(OBJDIR)/puffpatch.o:
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ puffpatch.cc
 
 
 .PHONY: all clean test
