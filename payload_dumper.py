@@ -121,6 +121,4 @@ for part in dam.partitions:
     # extents = flatten([op.dst_extents for op in part.operations])
     # assert verify_contiguous(extents), 'operations do not span full image'
 
-    sys.stdout.write("Processing %s partition" % part.partition_name)
-    sys.stdout.flush()
     dump_part(apobj,part)
