@@ -492,7 +492,22 @@ class PayloadApplier(object):
                          "--src_file=%s" % in_file_name,
                          "--dst_file=%s" % out_file_name,
                          "--patch_file=%s" % patch_file_name]
-        subprocess.check_call(puffpatch_cmd)
+        try:
+            subprocess.check_call(puffpatch_cmd)
+        except:
+            if (type(old_part_file) is bool):
+                sys.stdout.write("Failed to apply PUFFDIFF - expected compressed old_file but old_file is fake...")
+                sys.stdout.flush()
+                data_length=op.dst_length if op.dst_length else self._BytesInExtents(op.dst_extents, "%s.dst_extents")
+                with open(out_file_name,'wb') as tmpof:
+                    out_data = _ReadExtents(input_part_file, op.dst_extents, block_size,
+                             max_length=op.dst_length if op.dst_length else
+                             self._BytesInExtents(op.dst_extents,
+                                                  "%s.dst_extents"))
+                    tmpof.write(out_data)
+            else:
+                raise()
+
       else:
         raise PayloadError("Unknown operation %s", op.type)
 
