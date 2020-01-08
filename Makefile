@@ -5,3 +5,6 @@ puffin: puffin/puffin
 
 
 all: puffin
+
+clean:
+	$(MAKE) -C puffin/ clean
