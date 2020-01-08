@@ -549,7 +549,7 @@ class PayloadApplier(object):
       elif op.type == common.OpType.ZERO:
         self._ApplyZeroOperation(op, op_name, new_part_file)
       elif op.type == common.OpType.BSDIFF:
-        self._ApplyDiffOperation(op, op_name, data, new_part_file,
+        self._ApplyDiffOperation(op, op_name, data, old_part_file,
                                  new_part_file)
       elif op.type == common.OpType.SOURCE_COPY:
         self._ApplySourceCopyOperation(op, op_name, old_part_file,
