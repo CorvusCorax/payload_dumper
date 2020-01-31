@@ -456,7 +456,11 @@ class PayloadApplier(object):
                          "--patch_file=%s" % patch_file_name,
                          "--src_extents=%s" % in_extents_arg,
                          "--dst_extents=%s" % out_extents_arg]
-        subprocess.check_call(puffpatch_cmd)
+        try:
+            subprocess.check_call(puffpatch_cmd)
+        except:
+            sys.stdout.write("Failed to apply PUFFDIFF...")
+            sys.stdout.flush()
       else:
         raise PayloadError("Unknown operation %s", op.type)
 
