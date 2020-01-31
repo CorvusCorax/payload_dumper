@@ -49,7 +49,7 @@ def u64(x):
 
 
 def dump_part(apobj,part):
-    sys.stdout.write("Processing %s partition" % part.partition_name)
+    sys.stdout.write("Processing %s partition... " % part.partition_name)
     sys.stdout.flush()
 
     out_file = open('%s/%s.img' % (args.out, part.partition_name), 'wb+')
@@ -66,20 +66,20 @@ def dump_part(apobj,part):
         old_file = None
 
     if not old_file is None and not old_file is False:
-        sys.stdout.write("Checking Hash - should be %s ..." % part.old_partition_info.hash.encode('hex_codec'))
+        sys.stdout.write("Checking original Sha256, should be %s ... " % part.old_partition_info.hash.encode('base64'))
         sys.stdout.flush()
         try:
             applier._VerifySha256(old_file, part.old_partition_info.hash,
                       'old ' + part.partition_name, length=part.old_partition_info.size)
         except Exception as e:
-            sys.stdout.write("failed: %s..." % str(e))
+            sys.stdout.write("failed: %s... " % str(e))
             print
         else:
-            sys.stdout.write("passed...")
+            sys.stdout.write("passed... ")
         sys.stdout.flush()
 
 
-    sys.stdout.write("\nextracting...")
+    sys.stdout.write("\nextracting... ")
     sys.stdout.flush()
 
     try:
@@ -88,14 +88,14 @@ def dump_part(apobj,part):
     finally:
         pass
 
-    sys.stdout.write("truncating...")
+    sys.stdout.write("truncating... ")
     sys.stdout.flush()
     out_file.seek(0, 2)
     if out_file.tell() > part.new_partition_info.size:
       out_file.seek(new_part_info.size)
       out_file.truncate()
 
-    sys.stdout.write("Checking Hash - should be %s ..." % part.new_partition_info.hash.encode('hex_codec'))
+    sys.stdout.write("Checking new Sha256, should be %s ... " % part.new_partition_info.hash.encode('base64'))
     sys.stdout.flush()
     try:
         out_file.close()
@@ -103,10 +103,10 @@ def dump_part(apobj,part):
         applier._VerifySha256(out_file, part.new_partition_info.hash,
                   'new ' + part.partition_name, length=part.new_partition_info.size)
     except Exception as e:
-        sys.stdout.write("failed: %s..." % str(e))
+        sys.stdout.write("failed: %s... " % str(e))
         out_file.close()
     else:
-        sys.stdout.write("passed...")
+        sys.stdout.write("passed... ")
         out_file.close()
     sys.stdout.flush()
     if not (old_file is None) and not (type(old_file) is bool):
