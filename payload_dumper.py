@@ -49,11 +49,10 @@ def u64(x):
 
 
 def dump_part(apobj,part):
-    
     sys.stdout.write("Processing %s partition" % part.partition_name)
     sys.stdout.flush()
 
-    out_file = open('%s/%s.img' % (args.out, part.partition_name), 'wb')
+    out_file = open('%s/%s.img' % (args.out, part.partition_name), 'wb+')
     h = hashlib.sha256()
 
     if args.diff:
@@ -66,14 +65,54 @@ def dump_part(apobj,part):
     else:
         old_file = None
 
+    if not old_file is None and not old_file is False:
+        sys.stdout.write("Checking Hash - should be %s ..." % part.old_partition_info.hash.encode('hex_codec'))
+        sys.stdout.flush()
+        try:
+            applier._VerifySha256(old_file, part.old_partition_info.hash,
+                      'old ' + part.partition_name, length=part.old_partition_info.size)
+        except Exception as e:
+            sys.stdout.write("failed: %s..." % str(e))
+            print
+        else:
+            sys.stdout.write("passed...")
+        sys.stdout.flush()
+
+
+    sys.stdout.write("\nextracting...")
+    sys.stdout.flush()
+
     try:
         apobj._ApplyOperations(part.operations, part.partition_name, old_file,
-                              out_file, 999999999999999)
+                              out_file, part.new_partition_info.size)
     finally:
+        pass
+
+    sys.stdout.write("truncating...")
+    sys.stdout.flush()
+    out_file.seek(0, 2)
+    if out_file.tell() > part.new_partition_info.size:
+      out_file.seek(new_part_info.size)
+      out_file.truncate()
+
+    sys.stdout.write("Checking Hash - should be %s ..." % part.new_partition_info.hash.encode('hex_codec'))
+    sys.stdout.flush()
+    try:
         out_file.close()
-        if not (old_file is None) and not (type(old_file) is bool):
-            old_file.close()
-        print("Done")
+        out_file = open('%s/%s.img' % (args.out, part.partition_name), 'rb')
+        applier._VerifySha256(out_file, part.new_partition_info.hash,
+                  'new ' + part.partition_name, length=part.new_partition_info.size)
+    except Exception as e:
+        sys.stdout.write("failed: %s..." % str(e))
+        out_file.close()
+    else:
+        sys.stdout.write("passed...")
+        out_file.close()
+    sys.stdout.flush()
+    if not (old_file is None) and not (type(old_file) is bool):
+        old_file.close()
+    sys.stdout.write("done\n")
+    sys.stdout.flush()
 
 
 parser = argparse.ArgumentParser(description='OTA payload dumper')
